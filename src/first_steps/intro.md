@@ -1,4 +1,4 @@
-## Basic Radare2 Usage
+# Using Radare2
 
 The learning curve is usually somewhat steep at the beginning. Although after an hour of using it you should easily understand how most things work, and how to combine the various tools radare offers. You are encouraged to read the rest of this book to understand how some non-trivial things work, and to ultimately improve your skills.
 
@@ -14,7 +14,7 @@ The 'print' command is abbreviated as `p` and has a number of submodes — the s
 
 To be allowed to write files, specify the `-w` option to radare2 when opening a file. The `w` command can be used to write strings, hexpairs (`x` subcommand), or even assembly opcodes (`a` subcommand). Examples:
 
-```
+```console
 > w hello world         ; string
 > wx 90 90 90 90        ; hexpairs
 > wa jmp 0x8048140      ; assemble
@@ -29,4 +29,3 @@ To enter visual mode, press `V<enter>`. Use `q` to quit visual mode and return t
 In visual mode you can use HJKL keys to navigate (left, down, up, and right, respectively). You can use these keys in cursor mode toggled by `c` key. To select a byte range in cursor mode, hold down `SHIFT` key, and press navigation keys HJKL to mark your selection.
 
 While in visual mode, you can also overwrite bytes by pressing `i`. You can press `TAB` to switch between the hex (middle) and string (right) columns. Pressing `q` inside the hex panel returns you to visual mode. By pressing `p` or `P` you can scroll different visual mode representations. There is a second most important visual mode - curses-like panels interface, accessible with `V!` command.
-

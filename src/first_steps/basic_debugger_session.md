@@ -1,8 +1,8 @@
-# Basic Debugger Session
+## Basic Debugger Session
 
 To debug a program, start radare with the `-d` option. Note that you can attach to a running process by specifying its PID, or you can start a new program by specifying its name and parameters:
 
-```
+```console
 $ pidof mc
 32220
 $ r2 -d 32220
@@ -27,7 +27,8 @@ dcu main
 Be warned that certain malware or other tricky programs can actually execute code before `main()` and thus you'll be unable to control them. (Like the program constructor or the tls initializers)
 
 Below is a list of most common commands used with debugger:
-```
+
+```console
 > d?            ; get help on debugger commands
 > ds 3          ; step 3 times
 > db 0x8048920  ; setup a breakpoint
@@ -46,7 +47,7 @@ That way you will neither need to remember many commands nor to keep program sta
 
 To enter visual debugger mode use `Vpp`:
 
-```
+```console
 [0xb7f0c8c0]> Vpp
 ```
 
@@ -59,14 +60,15 @@ With the `c` key you can toggle the cursor mode to mark a byte range selection
 
 In visual mode you can enter regular radare commands by prepending them with `:`.
 For example, to dump a one block of memory contents at ESI:
+
 ```
 <Press ':'>
 x @ esi
 ```
+
 To get help on visual mode, press `?`. To scroll the help screen, use arrows. To
 exit the help view, press `q`.
 
 A frequently used command is `dr`, which is used to read or write values of the target's general purpose registers.
 For a more compact register value representation you might use `dr=` command.
 You can also manipulate the hardware and the extended/floating point registers.
-

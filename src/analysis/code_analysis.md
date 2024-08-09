@@ -1,4 +1,4 @@
-# Code Analysis
+## Code Analysis
 
 Code analysis is the process of finding patterns, combining information from different sources and process the disassembly of the program in multiple ways in order to understand and extract more details of the logic behind the code.
 
@@ -12,7 +12,7 @@ The most common radare2 analysis command sequence is `aa`, which stands for "ana
 
 Take some time to understand what each command does and the results after running them to find the best one for your needs.
 
-```
+```console
 [0x08048440]> aa
 [0x08048440]> pdf @ main
 		   ; DATA XREF from 0x08048457 (entry0)
@@ -76,13 +76,13 @@ control of the analysis process. Moreover, there is a treasure trove of configur
 for controlling the analysis outcomes. You can find them in `anal.*` and `emu.*`
 cfg variables' namespaces.
 
-## Analyze functions
+### Analyze functions
 
 One of the most important "basic" analysis commands is the set of `af` subcommands. `af` means
 "analyze function". Using this command you can either allow automatic analysis of the particular
 function or perform completely manual one.
 
-```
+```console
 [0x00000000]> af?
 Usage: af
 | af ([name]) ([addr])                  analyze functions (start at addr or $$)
@@ -114,6 +114,7 @@ Usage: af
 | afv[absrx]?                           manipulate args, registers and variables in function
 | afx                                   list function references
 ```
+
 You can use `afl` to list the functions found by the analysis.
 
 There are a lot of useful commands under `afl` such as `aflj`, which lists the function in JSON format and `aflm`, which lists the functions in the syntax found in makefiles.
@@ -131,7 +132,7 @@ the one specified by name as an argument, `aff` to readjust the function after a
 Apart from those semi-automatic ways to edit/analyze the function, you can hand craft it in the manual mode with `af+` command and edit basic blocks of it using `afb` commands.
 Before changing the basic blocks of the function it is recommended to check the already presented ones:
 
-```
+```console
 [0x00003ac0]> afb
 0x00003ac0 0x00003b7f 01:001A 191 f 0x00003b7f
 0x00003b7f 0x00003b84 00:0000 5 j 0x00003b92 f 0x00003b84
@@ -142,8 +143,10 @@ Before changing the basic blocks of the function it is recommended to check the 
 ```
 
 ### Hand craft function
+
 Before we start, let's prepare a binary file first. Write in `example.c`:
-```C
+
+```c
 int code_block()
 {
   int result = 0;
@@ -154,10 +157,12 @@ int code_block()
   return result;
 }
 ```
-then compile with `gcc -c example.c -m32 -O0 -fno-pie`, and open the object file `example.o` with radare2. 
+
+then compile with `gcc -c example.c -m32 -O0 -fno-pie`, and open the object file `example.o` with radare2.
 
 Since we haven't analyzed it yet, the `pdf` command will not print out the disassembly here:
-```
+
+```console
 $ r2 example.o 
 [0x08000034]> pdf
 p: Cannot find function at 0x08000034
@@ -181,20 +186,21 @@ p: Cannot find function at 0x08000034
             0x0800005c      c3             ret
 
 ```
+
 our goal is to handcraft a function with the following structure
 
 ![analyze_one](analyze_one.png)
 
-
 create a function at 0x8000034 named code_block:
-```
+
+```console
 [0x8000034]> af+ 0x8000034 code_block
 ```
 
 In most cases, we use jump or call instructions as code block boundaries. so the range of first block is from `0x08000034 push ebp` to `0x08000048 jmp 0x8000052`.
-use `afb+` command to add it. 
+use `afb+` command to add it.
 
-```
+```console
 [0x08000034]> afb+ code_block 0x8000034 0x800004a-0x8000034 0x8000052
 ```
 
@@ -202,18 +208,20 @@ note that the basic syntax of `afb+` is `afb+ function_address block_address blo
 
 the next block (0x08000052 ~ 0x08000056) is more likeyly an if conditional statement which has two branches. It will jump to 0x800004a if `jle-less or equal`, otherwise (the fail condition) jump to next instruction -- 0x08000058.:
 
-```
+```console
 [0x08000034]> afb+ code_block 0x8000052 0x8000058-0x8000052 0x800004a 0x8000058
 ```
 
 follow the control flow and create the remaining two blocks (two branches) :
-```
+
+```console
 [0x08000034]> afb+ code_block 0x800004a 0x8000052-0x800004a 0x8000052
 [0x08000034]> afb+ code_block 0x8000058 0x800005d-0x8000058
 ```
 
 check our work:
-```
+
+```console
 [0x08000034]> afb
 0x08000034 0x0800004a 00:0000 22 j 0x08000052
 0x0800004a 0x08000052 00:0000 8 j 0x08000052
@@ -228,15 +236,15 @@ There are two very important commands for this: `afc` and `afB`. The latter is a
 
 `afc` on the other side, allows to manually specify function calling convention. You can find more information on its usage in [calling_conventions](calling_conventions.md).
 
-## Recursive analysis
+### Recursive analysis
 
 There are 5 important program wide half-automated analysis commands:
 
- - `aab` - perform basic-block analysis ("Nucleus" algorithm)
- - `aac` - analyze function calls from one (selected or current function)
- - `aaf` - analyze all function calls
- - `aar` - analyze data references
- - `aad` - analyze pointers to pointers references
+* `aab` - perform basic-block analysis ("Nucleus" algorithm)
+* `aac` - analyze function calls from one (selected or current function)
+* `aaf` - analyze all function calls
+* `aar` - analyze data references
+* `aad` - analyze pointers to pointers references
 
 Those are only generic semi-automated reference searching algorithms. Radare2 provides a
 wide choice of manual references' creation of any kind. For this fine-grained control
@@ -271,7 +279,7 @@ The most commonly used `ax` commands are `axt` and `axf`, especially as a part o
 scripts. Lets say we see the string in the data or a code section and want to find all places
 it was referenced from, we should use `axt`:
 
-```
+```console
 [0x0001783a]> pd 2
 ;-- str.02x:
 ; STRING XREF from 0x00005de0 (sub.strlen_d50)
@@ -291,7 +299,7 @@ sub.strlen_d50 0x5de0 [STRING] lea rcx, str.02x
 
 There are also some useful commands under `axt`. Use `axtg` to generate radare2 commands which will help you to create graphs according to the XREFs.
 
-```
+```console
 [0x08048320]> s main
 [0x080483e0]> axtg
 agn 0x8048337 "entry0 + 23"
@@ -303,7 +311,7 @@ Use `axt*` to split the radare2 commands and set flags on those corresponding XR
 
 Also under `ax` is `axg`, which finds the path between two points in the file by showing an XREFs graph to reach the location or function. For example:
 
-```
+```console
 :> axg sym.imp.printf
 - 0x08048a5c fcn 0x08048a5c sym.imp.printf
   - 0x080483e5 fcn 0x080483e0 main
@@ -311,32 +319,33 @@ Also under `ax` is `axg`, which finds the path between two points in the file by
     - 0x08048337 fcn 0x08048320 entry0
   - 0x08048425 fcn 0x080483e0 main
 ```
+
 Use `axg*` to generate radare2 commands which will help you to create graphs using `agn` and `age` commands, according to the XREFs.
 
 Apart from predefined algorithms to identify functions there is a way to specify
 a function prelude with a configuration option `anal.prelude`. For example, like
 `e anal.prelude = 0x554889e5` which means
 
-```
+```x86asm
 push rbp
 mov rbp, rsp
 ```
 
 on x86\_64 platform. It should be specified _before_ any analysis commands.
 
-## Configuration
+### Configuration
 
 Radare2 allows to change the behavior of almost any analysis stages or commands.
 There are different kinds of the configuration options:
 
- - Flow control
- - Basic blocks control
- - References control
- - IO/Ranges
- - Jump tables analysis control
- - Platform/target specific options
+* Flow control
+* Basic blocks control
+* References control
+* IO/Ranges
+* Jump tables analysis control
+* Platform/target specific options
 
-### Control flow configuration
+#### Control flow configuration
 
 Two most commonly used options for changing the behavior of control flow analysis in radare2 are
 `anal.hasnext` and `anal.jmp.after`. The first one allows forcing radare2 to continue the analysis
@@ -357,37 +366,37 @@ For some unusual binaries or targets, there is an option `anal.noncode`. Radare2
 to analyze data sections as a code by default. But in some cases - malware, packed binaries,
 binaries for embedded systems, it is often a case. Thus - this option.
 
-### Reference control
+#### Reference control
 
 The most crucial options that change the analysis results drastically. Sometimes some can be
 disabled to save the time and memory when analyzing big binaries.
 
-- `anal.jmp.ref` - to allow references creation for unconditional jumps
-- `anal.jmp.cref` - same, but for conditional jumps
-- `anal.datarefs` - to follow the data references in code
-- `anal.refstr` - search for strings in data references
-- `anal.strings` - search for strings and creating references
+* `anal.jmp.ref` - to allow references creation for unconditional jumps
+* `anal.jmp.cref` - same, but for conditional jumps
+* `anal.datarefs` - to follow the data references in code
+* `anal.refstr` - search for strings in data references
+* `anal.strings` - search for strings and creating references
 
 Note that strings references control is disabled by default because it increases the analysis time.
 
-### Analysis ranges
+#### Analysis ranges
 
 There are a few options for this:
 
-- `anal.limits` - enables the range limits for analysis operations
-- `anal.from` - starting address of the limit range
-- `anal.to` - the corresponding end of the limit range
-- `anal.in` - specify search boundaries for analysis. You can set it to `io.maps`, `io.sections.exec`, `dbg.maps` and many more. For example:
-  - To analyze a specific memory map with `anal.from` and `anal.to`, set `anal.in = dbg.maps`.
-  - To analyze in the boundaries set by `anal.from` and `anal.to`, set `anal.in=range`.
-  - To analyze in the current mapped segment or section, you can put `anal.in=bin.segment` or `anal.in=bin.section`, respectively.
-  - To analyze in the current memory map, specify `anal.in=dbg.map`.
-  - To analyze in the stack or heap, you can set `anal.in=dbg.stack` or `anal.in=dbg.heap`.
-  - To analyze in the current function or basic block, you can specify `anal.in=anal.fcn` or `anal.in=anal.bb`.
+* `anal.limits` - enables the range limits for analysis operations
+* `anal.from` - starting address of the limit range
+* `anal.to` - the corresponding end of the limit range
+* `anal.in` - specify search boundaries for analysis. You can set it to `io.maps`, `io.sections.exec`, `dbg.maps` and many more. For example:
+  * To analyze a specific memory map with `anal.from` and `anal.to`, set `anal.in = dbg.maps`.
+  * To analyze in the boundaries set by `anal.from` and `anal.to`, set `anal.in=range`.
+  * To analyze in the current mapped segment or section, you can put `anal.in=bin.segment` or `anal.in=bin.section`, respectively.
+  * To analyze in the current memory map, specify `anal.in=dbg.map`.
+  * To analyze in the stack or heap, you can set `anal.in=dbg.stack` or `anal.in=dbg.heap`.
+  * To analyze in the current function or basic block, you can specify `anal.in=anal.fcn` or `anal.in=anal.bb`.
 
 Please see `e anal.in=??` for the complete list.
 
-### Jump tables
+#### Jump tables
 
 Jump tables are one of the trickiest targets in binary reverse engineering. There are hundreds
 of different types, the end result depending on the compiler/linker and LTO stages of optimization.
@@ -396,10 +405,10 @@ option. Eventually, algorithms moved into the default analysis loops once they s
 every supported platform/target/testcase.
 Two more options can affect the jump tables analysis results too:
 
-- `anal.jmp.indir` - follow the indirect jumps, some jump tables rely on them
-- `anal.datarefs` - follow the data references, some jump tables use those
+* `anal.jmp.indir` - follow the indirect jumps, some jump tables rely on them
+* `anal.datarefs` - follow the data references, some jump tables use those
 
-### Platform specific controls
+#### Platform specific controls
 
 There are two common problems when analyzing embedded targets: ARM/Thumb detection and MIPS GP
 value. In case of ARM binaries radare2 supports some auto-detection of ARM/Thumb mode switches, but
@@ -428,7 +437,7 @@ the minimap mode type `VV` then press `p` twice:
 
 This mode allows you to see the disassembly of each node separately, just navigate between them using `Tab` key.
 
-## Analysis hints
+### Analysis hints
 
 It is not an uncommon case that analysis results are not perfect even after you tried every single
 configuration option. This is where the "analysis hints" radare2 mechanism comes in. It allows
@@ -467,7 +476,7 @@ Usage: ah[lba-]  Analysis Hints
 
 One of the most common cases is to set a particular numeric base for immediates:
 
-```
+```console
 [0x00003d54]> ahi?
 Usage: ahi [2|8|10|10u|16|bodhipSs] [@ offset]   Define numeric base
 | ahi <base>  set numeric base (2, 8, 10, 16)
@@ -497,7 +506,7 @@ Usage: ahi [2|8|10|10u|16|bodhipSs] [@ offset]   Define numeric base
 It is notable that some analysis stages or commands add the internal analysis hints,
 which can be checked with `ah` command:
 
-```
+```console
 [0x00003d54]> ah
  0x00003d54 - 0x00003d54 => immbase=2
 [0x00003d54]> ah*
@@ -509,7 +518,7 @@ relocation, which is unknown for radare2, thus we can change the value manually.
 The current analysis information about a particular opcode can be checked with `ao` command.
 We can use `ahc` command for performing such a change:
 
-```
+```console
 [0x00003cee]> pd 2
 0x00003cee      e83d080100     call sub.__errno_location_530
 0x00003cf3      85c0           test eax, eax
@@ -565,7 +574,7 @@ As you can see, despite the unchanged disassembly view the jump address in opcod
 If anything of the previously described didn't help, you can simply override shown disassembly with anything you
 like:
 
-```
+```console
 [0x00003d54]> pd 2
 0x00003d54      0583000000     add eax, 10000011b
 0x00003d59      3d13010000     cmp eax, 0x113

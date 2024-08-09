@@ -1,9 +1,8 @@
-IOLI 0x02
-=========
+### IOLI 0x02
 
 This is the third one.
 
-```
+```console
 $ ./crackme0x02
 IOLI Crackme Level 0x02
 Password: hello
@@ -11,7 +10,8 @@ Invalid Password!
 ```
 
 check it with rabin2.
-```
+
+```console
 $ rabin2 -z ./crackme0x02
 [Strings]
 nth paddr      vaddr      len size section type  string
@@ -23,7 +23,8 @@ nth paddr      vaddr      len size section type  string
 ```
 
 similar to 0x01, no explicit password string here. so it's time to analyze it with r2.
-```
+
+```console
 [0x08048330]> aa
 [x] Analyze all flags starting with sym. and entry0 (aa)
 [0x08048330]> pdf@main
@@ -75,7 +76,8 @@ similar to 0x01, no explicit password string here. so it's time to analyze it wi
 ```
 
 with the experience of solving crackme0x02, we first locate the position of `cmp` instruction by using this simple oneliner:
-```
+
+```console
 [0x08048330]> pdf@main | grep cmp
 |           0x0804844e      3b45f4         cmp eax, dword [var_ch]
 ```
@@ -83,6 +85,7 @@ with the experience of solving crackme0x02, we first locate the position of `cmp
 Unfortunately, the variable compared to eax is stored in the stack. we can't check the value of this variable directly. It's a common case in reverse engineerning that we have to derive the value of the variable from the previous sequence. As the amount of code is relatively small, it's possible.
 
 for example:
+
 ```
 |           0x080483ed      b800000000     mov eax, 0
 |           0x080483f2      83c00f         add eax, 0xf                ; 15
@@ -95,7 +98,8 @@ for example:
 we can easily get the value of eax. it's 0x16.
 
 It gets hard when the scale of program grows. radare2 provides a pseudo disassembler output in C-like syntax. It may be useful.
-```
+
+```console
 [0x08048330]> pdc@main
 function main () {
     //  4 basic blocks
@@ -159,12 +163,14 @@ function main () {
 ```
 
 The `pdc` command is unreliable especially in processing loops (while, for, etc.). So I prefer to use the [r2dec](https://github.com/radareorg/r2dec-js) plugin in r2 repo to generate the pseudo C code. you can install it easily:
-```
+
+```sh
 r2pm install r2dec
 ```
 
 decompile `main()` with the following command (like `F5` in IDA):
-```C
+
+```c
 [0x08048330]> pdd@main
 /* r2dec pseudo code output */
 /* ./crackme0x02 @ 0x80483e4 */
@@ -206,26 +212,30 @@ int32_t main (void) {
 
 It's more human-readable now. To check the string in 0x804856c,
 we can:
+
 * seek
 * print string
-```
+
+```console
 [0x08048330]> s 0x804856c
 [0x0804856c]> ps
 %d
 ```
+
 it's exactly the format string of `scanf()`. But r2dec does not recognize the second argument (eax) which is a pointer. it points to var_4h and means our input will store in var_4h.
 
 we can easily write out pseudo code here.
-```C
+
+```c
 var_ch = (var_8h + var_ch)^2;
 if (var_ch == our_input)
   printf("Password OK :)\n");
 ```
 
-given the initial status that var_8h is 0x5a, var_ch is 0x1ec, we have 
+given the initial status that var_8h is 0x5a, var_ch is 0x1ec, we have
 var_ch = 338724 (0x52b24):
 
-```
+```console
 $ rax2 '=10' '(0x5a+0x1ec)*(0x5a+0x1ec)' 
 338724
 

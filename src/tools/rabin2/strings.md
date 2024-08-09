@@ -1,8 +1,8 @@
-## Strings
+### Strings
 
 The `-z` option is used to list readable strings found in the .rodata section of ELF binaries, or the .text section of PE files. Example:
 
-```
+```console
 $ rabin2 -z /bin/ls | head
 [Strings]
 nth paddr      vaddr      len size section type  string
@@ -21,7 +21,8 @@ nth paddr      vaddr      len size section type  string
 
 With the `-zr` option, this information is represented as a radare2 commands list. It can be used in a radare2 session to automatically create a flag space called "strings" pre-populated with flags for all strings found by rabin2.
 Furthermore, this script will mark corresponding byte ranges as strings instead of code.
-```
+
+```console
 $ rabin2 -zr /bin/ls | head
 fs stringsf str.dev_ino_pop 12 @ 0x000160f8
 Cs 12 @ 0x000160f8
@@ -34,4 +35,3 @@ Cs 5 @ 0x0001619a
 f str.pcdb_lswd 11 @ 0x00016250
 Cs 11 @ 0x00016250
 ```
-

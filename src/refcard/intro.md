@@ -1,4 +1,4 @@
-# Radare2 Reference Card
+# Reference Card
 
 This chapter is based on the Radare 2 reference card by Thanat0s, which is written under the GNU/GPL licence.
 
@@ -81,7 +81,6 @@ allows us to print it in utf-16, pascal, zero terminated, .. formats.
 | psp [offset] | Print pascal string            |
 | psw [offset] | Print wide string              |
 
-
 ## Visual mode
 
 The visual mode is the standard interactive interface of radare2.
@@ -118,7 +117,7 @@ have to press keys to get the actions happen instead of commands.
 | n/N            | Seek next/prev function/flag/hit (scr.nkey)       |
 | C              | Toggle (C)olors                                   |
 | R              | Randomize color palette (ecr)                     |
-| tT             | Tab related. see also [tab](visual_panels.md)     |
+| tT             | Tab related. see also [tab](../visual/visual_panels.md)     |
 | v              | Visual code analysis menu                         |
 | V              | (V)iew graph (agv?)                               |
 | wW             | Seek cursor to next/prev word                     |
@@ -126,7 +125,6 @@ have to press keys to get the actions happen instead of commands.
 | x              | Show xrefs of current func from/to data/code      |
 | yY             | Copy and paste selection                          |
 | z              | fold/unfold comments in diassembly                |
-
 
 ## Searching
 
@@ -165,8 +163,9 @@ where the `/` command may search for the given value.
 This feature has broken and not been resolved at the time of writing these words (Nov.16th 2020). check [#Issue 6945: META - Project files](https://github.com/radareorg/radare2/issues/6945) and [#Issue 17034](https://github.com/radareorg/radare2/issues/17034) for more details.
 
 To save your analysis for now, write your own script which records the function name, variable name, etc. for example:
-```sh
-vim sample_A.r2
+
+```console
+$ vim sample_A.r2
 
 e scr.utf8 = false
 s 0x000403ce0

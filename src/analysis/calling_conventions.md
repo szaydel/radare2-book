@@ -1,9 +1,9 @@
-# Calling Conventions
+## Calling Conventions
 
-Radare2 uses calling conventions to help in identifying function formal arguments and return types. 
+Radare2 uses calling conventions to help in identifying function formal arguments and return types.
 It is used also as a guide for basic function prototype and type propagation.
 
-```
+```console
 [0x00000000]> afc?
 |Usage: afc[agl?]
 | afc convention  Manually set calling convention for current function
@@ -21,15 +21,15 @@ It is used also as a guide for basic function prototype and type propagation.
 
 * To list all available calling conventions for current architecture using `afcl` command
 
-```
+```console
 [0x00000000]> afcl
 amd64
 ms
 ```
 
-* To display function prototype of standard library functions you have `afcf` command 
+* To display function prototype of standard library functions you have `afcf` command
 
-```
+```console
 [0x00000000]> afcf printf
 int printf(const char *format)
 [0x00000000]> afcf fgets
@@ -38,7 +38,7 @@ char *fgets(char *s, int size, FILE *stream)
 
 All this information is loaded via sdb under `/libr/anal/d/cc-[arch]-[bits].sdb`
 
-```
+```c
 default.cc=amd64
 
 ms=cc

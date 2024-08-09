@@ -1,0 +1,18 @@
+# Pandoc metadata file
+title: The Official Radare2 Book
+lang: en-US
+author:
+  - pancake <pancake@nopcode.org>
+keywords:
+  - book
+  - reverse-engineering
+  - radare2
+  - reversing
+  - radare
+
+cover-image: images/cover.jpg
+toc: true
+toc-depth: 5
+papersize: a5
+geometry:
+  - margin=1.5cm

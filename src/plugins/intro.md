@@ -10,16 +10,16 @@ This section aims to explain what are the plugins, how to write them and use the
 
 All of them can be installed via r2pm.
 
-* [r2frida](r2frida.md) - Frida and radare2 better together
+* [r2frida](../r2frida/intro.md) - Frida and radare2 better together
 * r2ghidra - use the Ghidra decompiler from radare2
 * r2dec - a decompiler written in JS for r2
 * r2yara - loading, scanning and creating Yara rules
 
-## Types of plugins
+## Skeletons
 
 See [r2skel](r2skel.md)
 
-```
+```console
 $ ls libr/*/p | grep : | awk -F / '{ print $2 }'
 anal      # analysis plugins
 asm       # assembler/disassembler plugins
@@ -38,18 +38,20 @@ reg       # arch register logic
 
 ## Listing plugins
 
-Some r2 tools have the `-L` flag to list all the plugins associated to the
-functionality.
+Some r2 tools have the `-L` flag to list all the plugins associated to the functionality.
+
 ```
 rasm2 -L    # list asm plugins
 r2 -L       # list io plugins
 rabin2 -L   # list bin plugins
 rahash2 -L  # list hash/crypto/encoding plugins
 ```
+
 There are more plugins in r2land, we can list them from inside r2, and this is
 done by using the `L` suffix.
 
 Those are some of the commands:
+
 ```
 L          # list core plugins
 iL         # list bin plugins
@@ -64,7 +66,7 @@ You can use the `?` as value to get the possible values in the associated eval v
 e asm.arch=?   # list assembler/disassembler plugins
 e anal.arch=?  # list analysis plugins
 ```
+
 ## Notes
 
 Note there are some inconsistencies that most likely will be fixed in the future radare2 versions.
-

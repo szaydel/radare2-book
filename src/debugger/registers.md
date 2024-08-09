@@ -1,10 +1,10 @@
-# Registers
+## Registers
 
 The registers are part of a user area stored in the context structure used by the scheduler. This structure can be manipulated to get and set the values of those registers, and, for example, on Intel hosts, it is possible to directly manipulate DR0-DR7 hardware registers to set hardware breakpoints.
 
 There are different commands to get values of registers. For the General Purpose ones use:
 
-```
+```console
 [0x4A13B8C0]> dr
 r15 = 0x00000000
 r14 = 0x00000000
@@ -33,7 +33,7 @@ rsp = 0x7fff515923c0
 
 Interaction between a plugin and the core is done by commands returning radare instructions. This is used, for example, to set flags in the core to set  values of registers.
 
-```
+```console
 [0x7f0f2dbae630]> dr*      ; Appending '*' will show radare commands
 f r15 1 0x0
 f r14 1 0x0
@@ -60,7 +60,7 @@ f rsp 1 0x7fff73557940
 
 An old copy of registers is stored all the time to keep track of the changes done during execution of a program being analyzed. This old copy can be accessed with `oregs`.
 
-```
+```console
 [0x7f1fab84c630]> dro
 r15 = 0x00000000
 r14 = 0x00000000
@@ -82,9 +82,10 @@ rip = 0x7f1fab84c630
 rflags = 0x00000200
 rsp = 0x7fff386b5080
 ```
+
 Current state of registers
 
-```
+```console
 [0x7f1fab84c630]> dr
 r15 = 0x00000000
 r14 = 0x00000000
@@ -111,21 +112,21 @@ Values stored in eax, oeax and eip have changed.
 
 To store and restore register values you can just dump the output of 'dr*' command to disk and then re-interpret it again:
 
-```
+```console
 [0x4A13B8C0]> dr* > regs.saved ; save registers
 [0x4A13B8C0]> drp regs.saved ; restore
 ```
 
 EFLAGS can be similarly altered. E.g., setting selected flags:
 
-```
+```console
 [0x4A13B8C0]> dr eflags = pst
 [0x4A13B8C0]> dr eflags = azsti
 ```
 
 You can get a string which represents latest changes of registers using `drd` command (diff registers):
 
-```
+```console
 [0x4A13B8C0]> drd
 oeax = 0x0000003b was 0x00000000 delta 59
 rip = 0x7f00e71282d0 was 0x00000000 delta -418217264
@@ -147,7 +148,7 @@ Radare2 is able to parse the gdb xml register profile and generate one in the ra
 
 Let's check how the x86-16 (real mode) register profile looks like by typing the following command:
 
-```
+```console
 $ r2 -a x86 -b 16 -qc arp --
 =PC	ip
 =SP	sp
@@ -193,6 +194,18 @@ flg	if	.1	.454	0
 flg	df	.1	.455	0
 flg	of	.1	.456	0
 flg	rf	.1	.457	0
+```
+
+### Custom Register Profiles
+
+Register profiles are usually 'static', in the sense that users won't need to modify them because they are designed to work well with the selected debugger backend or the esil implementation for the given architecture. But sometimes, you may want to add support for a new target or fix a bug, add temporary registers, experiment with it, ..
+
+These are the commands you must use to dump the current register profile to a file, edit it and then load it again:
+
+```sh
+drp > profile.txt
+vim profile.txt
+drp profile.txt
 ```
 
 ### Understanding Each Row

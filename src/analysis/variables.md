@@ -1,4 +1,4 @@
-# Managing variables
+## Managing variables
 
 Radare2 allows managing local variables, no matter their location, stack or registers.
 The variables' auto analysis is enabled by default but can be disabled with `anal.vars`
@@ -56,7 +56,7 @@ As mentioned before the analysis loop relies heavily on types information while 
 variables analysis stages. Thus comes next very important command - `afvt`, which
 allows you to change the type of variable:
 
-```
+```console
 [0x00003b92]> afvs
 var int local_8h @ rsp+0x8
 var int local_10h @ rsp+0x10
@@ -87,7 +87,7 @@ variables being read and written. You can list those being read with `afvR` comm
 being written with `afvW` command. Both commands provide a list of the places those operations
 are performed:
 
-```
+```console
 [0x00003b92]> afvR
 local_48h  0x48ee
 local_30h  0x3c93,0x520b,0x52ea,0x532c,0x5400,0x3cfb
@@ -113,13 +113,13 @@ local_32h
 [0x00003b92]>
 ```
 
-## Type inference
+### Type inference
 
 The type inference for local variables and arguments is well integrated with the command `afta`.
 
 Let's see an example of this with a simple [hello_world](https://github.com/radareorg/radare2book/tree/master/examples/hello_world) binary
 
-```
+```console
 [0x000007aa]> pdf
 |           ;-- main:
 / (fcn) sym.main 157
@@ -144,7 +144,7 @@ Let's see an example of this with a simple [hello_world](https://github.com/rada
 
 * After applying `afta`
 
-```
+```console
 [0x000007aa]> afta
 [0x000007aa]> pdf
 | ;-- main:
@@ -177,6 +177,7 @@ You could create a new profile for specifying a set of format chars depending on
 win=spec
 spec.win.u32=unsigned int
 ```
+
 Then change your default specification to newly created one using this config variable `e anal.spec = win`
 
 For more information about primitive and user-defined types support in radare2 refer to [types](types.md) chapter.

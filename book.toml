@@ -1,3 +1,5 @@
+# mdBook configuration file
+
 [book]
 title = "The Official Radare2 Book"
 author = "pancake <pancake@nopcode.org>"
@@ -6,6 +8,13 @@ language = "en"
 
 [build]
 create-missing = false
+
+[output.html]
+default-theme = "light"
+preferred-dark-theme = "ayu"
+git-repository-url = "https://github.com/radareorg/radare2-book"
+edit-url-template = "https://github.com/radareorg/radare2-book/edit/master/{path}"
+site-url = "/"
 
 [output.html.search]
 limit-results = 15

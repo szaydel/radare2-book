@@ -1,7 +1,8 @@
-## File Properties Identification
+### File Properties Identification
 
 File type identification is done using `-I`. With this option, rabin2 prints information on a binary type, like its encoding, endianness, class, operating system:
-```
+
+```console
 $ rabin2 -I /bin/ls
 arch     x86
 binsz    128456
@@ -33,7 +34,8 @@ va       true
 ```
 
 To make rabin2 output information in format that the main program, radare2, can understand, pass `-Ir` option to it:
-```
+
+```console
 $ rabin2 -Ir /bin/ls
 e cfg.bigendian=false
 e asm.bits=64
@@ -44,4 +46,3 @@ e asm.os=linux
 e asm.arch=x86
 e asm.pcalign=0
 ```
-
